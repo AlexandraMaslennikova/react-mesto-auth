@@ -1,0 +1,8 @@
+.popup__title_type_image {
+    align-self: flex-start;
+    color: #fff;
+    font-weight: normal;
+    font-size: 12px;
+    line-height: 15px;
+    padding-top: 10px;
+}

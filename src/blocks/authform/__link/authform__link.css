@@ -1,0 +1,13 @@
+.authform__link {
+    margin-top: 15px;
+    color: #fff;
+    font-weight: normal;
+    font-size: 14px;
+    line-height: 17px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.authform__link:hover {
+    opacity: .8;    
+}
