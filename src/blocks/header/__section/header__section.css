@@ -1,0 +1,6 @@
+.header__section {
+    display: flex;
+    align-items: baseline;
+    flex-direction: row;
+    gap: 24px;
+}

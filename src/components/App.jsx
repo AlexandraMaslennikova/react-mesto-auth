@@ -1,13 +1,9 @@
 import React from 'react';
 import { useState, useEffect } from "react";
-import { Route,
-        Switch, 
-        Redirect, 
-        withRouter,
-        useLocation,
-        useHistory } 
-        from 'react-router-dom';
+import { Route, Switch, useHistory } from 'react-router-dom';
 import '../index.css';
+import successfulImage from '../images/successfulImage.png';
+import unsuccessfulImage from '../images/unsuccessfulImage.png';
 
 import api from '../utils/api';
 import * as auth from '../utils/auth';
@@ -22,6 +18,7 @@ import AddPlacePopup from './AddPlacePopup';
 import ProtectedRoute from './ProtectedRoute';
 import Register from './Register';
 import Login from './Login';
+import InfoTooltip from './InfoTooltip';
 
 import CurrentUserContext from '../contexts/CurrentUserContext'
 
@@ -32,22 +29,38 @@ function App() {
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
+  const [isInfoTooltipOpen, setIsInfoTooltipOpen] = useState(false);
   //карточки
   const [cards, setCards] = useState([]);
   const [selectedCard, setSelectedCard] = useState({});
   //данные пользователя
   const [currentUser, setCurrentUser] = useState({});
+  const [userEmail, setUserEmail] = useState('');
 
   const history = useHistory();
   const [loggedIn, setLoggedIn] = useState(false);
+
+  //сообщение о результате регистрации
+  const [message, setMessage] = useState('');
+  const [tooltipImage, setTooltipImage] = useState('');
   
   //регистрация пользователя
   function handleRegistration(formData) {
       auth.register(formData.email, formData.password)
         .then(() => {
+          setTooltipImage(successfulImage)
+          setMessage('Вы успешно зарегистрировались!');
+          handleInfoTooltipClick()
           history.push("/sign-in");
         })
-        .catch(err => console.log(err));
+        .catch(error => {
+          handleInfoTooltipClick()
+          setTooltipImage(unsuccessfulImage)
+          setMessage('Что-то пошло не так! Попробуйте ещё раз.');
+          if (error === 'Ошибка: 400') {
+            console.log('не передано одно из полей');
+          }
+        })
   }
 
   //вход в аккаунт
@@ -55,23 +68,30 @@ function App() {
     auth.authorize(formData.email, formData.password)
       .then((data) => {
         localStorage.setItem('token', data.token);
-        console.log(data)
         setLoggedIn(true);
+        setUserEmail(formData.email);
         history.push("/");
-        console.log('Привет из входа')
       })
-      .catch(err => console.log(err));
+      .catch(error => {
+        handleInfoTooltipClick()
+        setTooltipImage(unsuccessfulImage)
+        setMessage('Что-то пошло не так! Попробуйте ещё раз.');
+        if (error === 'Ошибка: 400') {
+          console.log('не передано одно из полей');
+        } else if (error === 'Ошибка: 401') {
+          console.log('Пользователь с данным email не найден');
+        }
+      });
   }
 
    //проверка токена
   useEffect(() => {
     if (localStorage.getItem('token')) {
       const token = localStorage.getItem('token');
-      console.log(token)
-      // проверяем токен пользователя
       auth.checkToken(token)
-      .then(() => {
+      .then((res) => {
         setLoggedIn(true);
+        setUserEmail(res.data.email)
         history.push("/");
       })
       .catch(err => console.log(err));
@@ -168,6 +188,10 @@ function App() {
         });
     }
 
+  //открытие окна информации о состоянии регистрации
+  function handleInfoTooltipClick() {
+    setIsInfoTooltipOpen(true);
+  }
 
   //открытие окна редактироования аватар
   function handleEditAvatarClick() {
@@ -194,6 +218,7 @@ function App() {
     setIsEditAvatarPopupOpen(false);
     setIsEditProfilePopupOpen(false);
     setIsAddPlacePopupOpen(false);
+    setIsInfoTooltipOpen(false);
     setSelectedCard({})
   }
 
@@ -202,7 +227,11 @@ function App() {
     <CurrentUserContext.Provider value={currentUser}>
       <div className="App">
         <div className="page">
-          <Header />
+          <Header
+            loggedIn={loggedIn}
+            userEmail={userEmail}
+            onLogout={logout} 
+          />
           
             <Switch>
               <ProtectedRoute
@@ -228,6 +257,15 @@ function App() {
             </Switch>
 
           <Footer />
+
+          <InfoTooltip
+            image={tooltipImage}
+            message={message}
+            loggedIn={loggedIn}
+            isOpen={isInfoTooltipOpen}
+            onClose={closeAllPopups}
+          />
+
           <EditProfilePopup 
             isOpen={isEditProfilePopupOpen} 
             onClose={closeAllPopups}
