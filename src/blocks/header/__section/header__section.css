@@ -4,3 +4,9 @@
     flex-direction: row;
     gap: 24px;
 }
+
+@media screen and (max-width:980px) {
+    .header__section {
+        margin-right: 27px;
+    }
+}

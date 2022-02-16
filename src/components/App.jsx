@@ -58,7 +58,7 @@ function App() {
           setTooltipImage(unsuccessfulImage)
           setMessage('Что-то пошло не так! Попробуйте ещё раз.');
           if (error === 'Ошибка: 400') {
-            console.log('не передано одно из полей');
+            console.log('Некорректно заполнено одно из полей');
           }
         })
   }
@@ -77,7 +77,7 @@ function App() {
         setTooltipImage(unsuccessfulImage)
         setMessage('Что-то пошло не так! Попробуйте ещё раз.');
         if (error === 'Ошибка: 400') {
-          console.log('не передано одно из полей');
+          console.log('Не передано одно из полей');
         } else if (error === 'Ошибка: 401') {
           console.log('Пользователь с данным email не найден');
         }
@@ -114,7 +114,7 @@ function App() {
         setCurrentUser(data);
       })
       .catch((error) => {
-        console.log('Ошибка получения данных', error);
+        console.log('Ошибка получения данных пользователя', error);
       });
   }, []);
 
@@ -137,7 +137,7 @@ function App() {
           closeAllPopups();
         })
         .catch((error) => {
-          console.log('Ошибка добавление новой карточки', error);
+          console.log('Ошибка добавления новой карточки', error);
         });
     }
 
