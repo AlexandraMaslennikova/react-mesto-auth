@@ -1,4 +1,6 @@
 .authform {
+    min-height: 601px;
+    max-height: calc(100vh - 330px);
     margin: 60px auto 0;
     display: flex;
     align-items: center;
